@@ -3,18 +3,18 @@ from app.repositories.user_repository import UserRepository
 from app.core.security import create_access_token, create_refresh_token, hash_password, verify_password
 from app.repositories.token_repository import TokenRepository
 from jose import jwt, JWTError
-from app.core.security import SECRET_KEY, ALGORITHM
+from app.core.config import config
 
 
 class AuthService:
 
     @staticmethod
-    def signup(db: Session, username: str, email: str, password: str):
-        existing = UserRepository.get_by_email(db, email)
+    async def signup(db: Session, username: str, email: str, password: str):
+        existing = await UserRepository.get_by_email(db, email)
         if existing:
             raise Exception("Email already exists")
 
-        return UserRepository.create_user(
+        return await UserRepository.create_user(
             db,
             username,
             email,
@@ -23,8 +23,8 @@ class AuthService:
 
 
     @staticmethod
-    def login(db: Session, email: str, password: str):
-        user = UserRepository.get_by_email(db, email)
+    async def login(db: Session, email: str, password: str):
+        user = await UserRepository.get_by_email(db, email)
 
         if not user or not verify_password(password, user.password):
             raise Exception("Invalid credentials")
@@ -32,7 +32,7 @@ class AuthService:
         access_token = create_access_token({"sub": str(user.id)})
         refresh_token = create_refresh_token({"sub": str(user.id)})
 
-        TokenRepository.save_refresh_token(db, user.id, refresh_token)
+        await TokenRepository.save_refresh_token(db, user.id, refresh_token)
 
         return {
             "access_token": access_token,
@@ -41,16 +41,16 @@ class AuthService:
         }
     
     @staticmethod
-    def refresh_token(db: Session, refresh_token: str):
+    async def refresh_token(db: Session, refresh_token: str):
         try:
-            payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
+            payload = jwt.decode(refresh_token, config.JWT_SECRET, algorithms=[config.ALGORITHM])
             user_id = payload.get("sub")
 
             if not user_id:
                 raise Exception("Invalid token")
 
             # check if token exists in DB (revocation check)
-            stored = TokenRepository.get_token(db, refresh_token)
+            stored = await TokenRepository.get_token(db, refresh_token)
             if not stored:
                 raise Exception("Token revoked")
 
@@ -65,6 +65,6 @@ class AuthService:
             raise Exception("Invalid refresh token")
         
     @staticmethod
-    def logout(db: Session, refresh_token: str):
-        TokenRepository.delete_token(db, refresh_token)
+    async def logout(db: Session, refresh_token: str):
+        await TokenRepository.delete_token(db, refresh_token)
         return {"message": "Logged out"}

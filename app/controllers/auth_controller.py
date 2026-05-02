@@ -4,9 +4,9 @@ from app.schemas.auth import RefreshRequest, SignupRequest, LoginRequest
 from app.services.auth_service import AuthService
 
 
-def signup_controller(data: SignupRequest, db: Session):
+async def signup_controller(data: SignupRequest, db: Session):
     try:
-        user = AuthService.signup(
+        user = await AuthService.signup(
             db,
             data.username,
             data.email,
@@ -17,9 +17,9 @@ def signup_controller(data: SignupRequest, db: Session):
         raise HTTPException(status_code=400, detail=str(e))
 
 
-def login_controller(data: LoginRequest, db: Session):
+async def login_controller(data: LoginRequest, db: Session):
     try:
-        user = AuthService.login(
+        user = await AuthService.login(
             db,
             data.email,
             data.password
@@ -29,9 +29,9 @@ def login_controller(data: LoginRequest, db: Session):
         raise HTTPException(status_code=400, detail=str(e))
     
 
-def refresh_controller(data: RefreshRequest, db: Session):
+async def refresh_controller(data: RefreshRequest, db: Session):
     try:
-        user = AuthService.refresh_token(
+        user = await AuthService.refresh_token(
             db,
             data.refresh_token
         )
@@ -39,9 +39,9 @@ def refresh_controller(data: RefreshRequest, db: Session):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
     
-def logout_controller(data: RefreshRequest, db: Session):
+async def logout_controller(data: RefreshRequest, db: Session):
     try:
-        user = AuthService.logout(
+        user = await AuthService.logout(
             db,
             data.refresh_token
         )

@@ -1,4 +1,6 @@
-from sqlalchemy import String, Integer
+from datetime import datetime, timezone
+
+from sqlalchemy import String, Integer, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base
 
@@ -8,20 +10,24 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
 
-    username: Mapped[str] = mapped_column(
-        String(50), unique=True, index=True, nullable=False
-    )
+    username: Mapped[str] = mapped_column(String(50), unique=True, index=True)
+    email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
+    password: Mapped[str] = mapped_column(String(255))
 
-    email: Mapped[str] = mapped_column(
-        String(255), unique=True, index=True, nullable=False
-    )
-
-    password: Mapped[str] = mapped_column(
-        String(255), nullable=False
-    )
-
-    # relationships (prepare for later)
     posts = relationship("Post", back_populates="user")
+
+    created_at = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False
+    )
+
+    updated_at = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+        nullable=False
+    )
 
     following = relationship(
         "Follow",

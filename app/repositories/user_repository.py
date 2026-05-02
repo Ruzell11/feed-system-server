@@ -1,21 +1,23 @@
-from sqlalchemy.orm import Session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.user import User
 
 
 class UserRepository:
 
     @staticmethod
-    def get_by_email(db: Session, email: str):
-        return db.query(User).filter(User.email == email).first()
+    async def get_by_email(db: AsyncSession, email: str):
+        result = await db.execute(
+            select(User).where(User.email == email)
+        )
+        return result.scalar_one_or_none()
 
     @staticmethod
-    def create_user(db: Session, username: str, email: str, password: str):
-        user = User(
-            username=username,
-            email=email,
-            password=password
-        )
+    async def create_user(db: AsyncSession, username: str, email: str, password: str):
+        user = User(username=username, email=email, password=password)
+
         db.add(user)
-        db.commit()
-        db.refresh(user)
+        await db.commit()
+        await db.refresh(user)
+
         return user
