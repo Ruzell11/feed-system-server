@@ -127,30 +127,8 @@ Queueing solves:
 - Passlib (Password hashing)
 - Queue System (Background processing for scaling)
 
----
 
-## 🔄 Authentication Flow
 
-1. User signs up → password is hashed
-2. User logs in → receives:
-   - Access token (short-lived)
-   - Refresh token (long-lived)
-3. Access token is used for API requests
-4. Refresh token generates new access token when expired
-5. Logout deletes refresh token from database
-
----
-
-## 🚧 Future Improvements
-
-- Feed optimization (fan-out on read vs write vs hybrid)
-- Redis caching layer for performance
-- Worker scaling for queue system
-- Rate limiting for API protection
-- JWT middleware for secured routes
-- Observability (logging & monitoring)
-
----
 
 ## 💡 Key Takeaway
 
