@@ -8,7 +8,7 @@ from app.controllers.feed_controller import get_feed_controller
 router = APIRouter(prefix="/feed", tags=["Feed"])
 
 
-@router.get("/")
+@router.get("")
 async def get_feed(
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_current_user),

@@ -1,10 +1,10 @@
 from fastapi import HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas.auth import RefreshRequest, SignupRequest, LoginRequest
 from app.services.auth_service import AuthService
 
 
-async def signup_controller(data: SignupRequest, db: Session):
+async def signup_controller(data: SignupRequest, db: AsyncSession):
     try:
         user = await AuthService.signup(
             db,
@@ -17,7 +17,7 @@ async def signup_controller(data: SignupRequest, db: Session):
         raise HTTPException(status_code=400, detail=str(e))
 
 
-async def login_controller(data: LoginRequest, db: Session):
+async def login_controller(data: LoginRequest, db: AsyncSession):
     try:
         user = await AuthService.login(
             db,
@@ -29,7 +29,7 @@ async def login_controller(data: LoginRequest, db: Session):
         raise HTTPException(status_code=400, detail=str(e))
     
 
-async def refresh_controller(data: RefreshRequest, db: Session):
+async def refresh_controller(data: RefreshRequest, db: AsyncSession):
     try:
         user = await AuthService.refresh_token(
             db,
@@ -39,7 +39,7 @@ async def refresh_controller(data: RefreshRequest, db: Session):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
     
-async def logout_controller(data: RefreshRequest, db: Session):
+async def logout_controller(data: RefreshRequest, db: AsyncSession):
     try:
         user = await AuthService.logout(
             db,

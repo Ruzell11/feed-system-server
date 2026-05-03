@@ -11,6 +11,8 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
 
     try:
         payload = jwt.decode(token, config.JWT_SECRET, algorithms=[config.ALGORITHM])
+        print("PAYLOAD:", payload)  # 🔥 add this
+
         user_id = payload.get("sub")
 
         if not user_id:
@@ -18,5 +20,6 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
 
         return int(user_id)
 
-    except JWTError:
+    except JWTError as e:
+        print("JWT ERROR:", str(e))  # 🔥 add this
         raise HTTPException(status_code=401, detail="Invalid or expired token")
